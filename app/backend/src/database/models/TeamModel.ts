@@ -27,3 +27,5 @@ Team.init(
     underscored: true,
   },
 );
+
+export default Team;
