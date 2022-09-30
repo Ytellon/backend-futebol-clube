@@ -1,5 +1,6 @@
 import * as sinon from "sinon";
 import * as chai from "chai";
+import * as jwt from "jsonwebtoken";
 // @ts-ignore
 import chaiHttp = require("chai-http");
 
@@ -7,6 +8,7 @@ import { app } from "../app";
 import User from "../database/models/UserModel";
 
 import { Response } from "superagent";
+import { verify } from "crypto";
 
 chai.use(chaiHttp);
 
@@ -92,6 +94,23 @@ describe("Test login http", () => {
       });
       expect(response.status).to.be.equal(400);
       expect(response.body.message).to.be.equal('All fields must be filled');
+    });
+  });
+  describe('should return status 200, token valid', () => {
+    before(() => {
+      sinon.stub(jwt, 'verify').callsFake(() => {
+        return Promise.resolve({success: 'Token is valid'});
+    });
+      sinon.stub(User, "findOne").resolves(userADM as User);
+    });
+    after(() => {
+      (User.findOne as sinon.SinonStub).restore();
+      (jwt.verify as sinon.SinonStub).restore();
+    });
+    it('should return status 200', async () => {
+      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY2NDU3MTMzMywiZXhwIjoxNjY1MTc2MTMzfQ.9lqyTGP2E5IZG6x8KmUL-Sf5fSNnmTAzA_mVtoQ3_o4';
+      const response = await chai.request(app).get('/login/validate').set('authorization', token);
+      expect(response.status).to.be.equal(200);
     });
   });
 });
