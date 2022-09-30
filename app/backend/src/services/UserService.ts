@@ -2,16 +2,12 @@ import { compareSync } from 'bcryptjs';
 import createToken from '../utils/CreateToken';
 import { IUserLogin } from '../interfaces/userInterface';
 import CustomError from '../middleware/customError';
-
-import UserModel from '../Models/userModel';
+import User from '../database/models/UserModel';
 
 export default class LoginService {
-  constructor(private Model = new UserModel()) {}
-
-  public async login(user: IUserLogin) {
+  login = async (user: IUserLogin) => {
     const { email, password } = user;
-    const userFound = await this.Model.findOne(email);
-    console.log(userFound);
+    const userFound = await User.findOne({ where: { email } });
     if (!userFound) {
       throw new CustomError(401, 'Incorrect email or password');
     }
@@ -21,5 +17,5 @@ export default class LoginService {
     }
     const token = createToken(userFound.email);
     return token;
-  }
+  };
 }
