@@ -11,7 +11,7 @@ const validateLogin = (req: Request, res: Response, next: NextFunction) => {
   }
   const emailRegex = /\S+@\S+\.\S+/;
   if (!emailRegex.test(email)) {
-    throw new CustomError(400, 'Incorrect email or password');
+    throw new CustomError(401, 'Incorrect email or password');
   }
   next();
 };
