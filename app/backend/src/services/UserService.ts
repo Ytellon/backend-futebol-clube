@@ -15,7 +15,8 @@ export default class LoginService {
     if (!validatePassword) {
       throw new CustomError(401, 'Incorrect email or password');
     }
-    const token = createToken(userFound.email);
+    const payload = { email: userFound.email, role: userFound.role };
+    const token = createToken(payload);
     return token;
   };
 }

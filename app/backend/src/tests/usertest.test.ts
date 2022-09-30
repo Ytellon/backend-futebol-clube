@@ -94,5 +94,4 @@ describe("Test login http", () => {
       expect(response.body.message).to.be.equal('All fields must be filled');
     });
   });
-  
 });

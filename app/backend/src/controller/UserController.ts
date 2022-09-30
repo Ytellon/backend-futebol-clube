@@ -13,4 +13,13 @@ export default class UserController {
       next(error);
     }
   };
+
+  loginValidate = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { role } = res.locals.user;
+      return res.status(200).json({ role });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
