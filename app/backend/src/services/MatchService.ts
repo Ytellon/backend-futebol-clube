@@ -45,10 +45,15 @@ export default class MatchService {
 
   createMatch = async (match: IMatch): Promise <IMatch> => {
     const { homeTeam, awayTeam } = match;
-    const newMatch = await MatchesModel.create({ ...match, inProgress: true });
     if (homeTeam === awayTeam) {
       throw new CustomError(401, 'It is not possible to create a match with two equal teams');
     }
+    const hTeam = await TeamModel.findOne({ where: { id: homeTeam } });
+    const aTeam = await TeamModel.findOne({ where: { id: awayTeam } });
+    if (!hTeam || !aTeam) {
+      throw new CustomError(404, 'There is no team with such id!');
+    }
+    const newMatch = await MatchesModel.create({ ...match, inProgress: true });
     return newMatch;
   };
 
