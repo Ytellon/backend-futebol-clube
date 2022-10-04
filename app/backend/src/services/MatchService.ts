@@ -41,4 +41,9 @@ export default class MatchService {
     });
     return matches;
   };
+
+  createMatch = async (match: IMatch): Promise <IMatch> => {
+    const newMatch = await MatchesModel.create({ ...match, inProgress: true });
+    return newMatch;
+  };
 }
