@@ -46,4 +46,10 @@ export default class MatchService {
     const newMatch = await MatchesModel.create({ ...match, inProgress: true });
     return newMatch;
   };
+
+  updateMatch = async (id: number): Promise <object> => {
+    await MatchesModel.update({
+      inProgress: false }, { where: { id } });
+    return { message: 'Finished' };
+  };
 }

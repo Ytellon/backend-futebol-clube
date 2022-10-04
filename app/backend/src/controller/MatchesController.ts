@@ -27,4 +27,14 @@ export default class MatchController {
       next(error);
     }
   };
+
+  updateMatch = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      const match = await this.service.updateMatch(Number(id));
+      return res.status(200).json(match);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
