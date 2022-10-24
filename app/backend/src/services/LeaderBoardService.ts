@@ -4,19 +4,19 @@ import { ILeaderBoardInterface,
   ILeaderBoardOutInterface } from '../interfaces/leaderBoardInterface';
 
 export default class LeaderBoardService {
-  filterGameByName = async () => {
+  filterGameByHome = async () => {
     const teams = await TeamModel.findAll();
     const homeMatches = await Promise.all(teams.map(
       async (team) => {
-        const filterMatch = await this.matches(team.id);
-        const newLeaderBoarder = this.gameAccumulator(filterMatch);
+        const filterMatch = await this.homeMatches(team.id);
+        const newLeaderBoarder = this.gameAccumulatorHome(filterMatch);
         return { name: team.teamName, ...newLeaderBoarder };
       },
     ));
     return homeMatches;
   };
 
-  matches = async (id: number) => {
+  homeMatches = async (id: number) => {
     const matches = await MatchesModel.findAll({
       where: {
         homeTeam: id,
@@ -26,7 +26,7 @@ export default class LeaderBoardService {
     return matches;
   };
 
-  gameAccumulator = (matches: ILeaderBoardInterface[]): ILeaderBoardOutInterface => {
+  gameAccumulatorHome = (matches: ILeaderBoardInterface[]): ILeaderBoardOutInterface => {
     const totalGames = matches.length;
     const totalVic = matches.filter((match) => match.homeTeamGoals > match.awayTeamGoals).length;
     const totalDraw = matches.filter((match) => match.homeTeamGoals === match.awayTeamGoals).length;
@@ -34,6 +34,50 @@ export default class LeaderBoardService {
     const totalPoints = (totalVic * 3) + totalDraw;
     const goalsFavor = matches.reduce((acc, match) => acc + match.homeTeamGoals, 0);
     const goalsOwn = matches.reduce((acc, match) => acc + match.awayTeamGoals, 0);
+    const goalsBalance = goalsFavor - goalsOwn;
+    const efficiency = ((totalPoints / (totalGames * 3)) * 100).toFixed(2);
+
+    return { totalPoints,
+      totalGames,
+      totalVictories: totalVic,
+      totalDraws: totalDraw,
+      totalLosses,
+      goalsFavor,
+      goalsOwn,
+      goalsBalance,
+      efficiency };
+  };
+
+  filterGameByAway = async () => {
+    const teams = await TeamModel.findAll();
+    const awayMatches = await Promise.all(teams.map(
+      async (team) => {
+        const filterMatch = await this.awayMatches(team.id);
+        const newLeaderBoarder = this.gameAccumulatorAway(filterMatch);
+        return { name: team.teamName, ...newLeaderBoarder };
+      },
+    ));
+    return awayMatches;
+  };
+
+  awayMatches = async (id: number) => {
+    const matches = await MatchesModel.findAll({
+      where: {
+        awayTeam: id,
+        inProgress: false,
+      },
+    });
+    return matches;
+  };
+
+  gameAccumulatorAway = (matches: ILeaderBoardInterface[]): ILeaderBoardOutInterface => {
+    const totalGames = matches.length;
+    const totalVic = matches.filter((match) => match.awayTeamGoals > match.homeTeamGoals).length;
+    const totalDraw = matches.filter((match) => match.awayTeamGoals === match.homeTeamGoals).length;
+    const totalLosses = matches.filter((match) => match.awayTeamGoals < match.homeTeamGoals).length;
+    const totalPoints = (totalVic * 3) + totalDraw;
+    const goalsFavor = matches.reduce((acc, match) => acc + match.awayTeamGoals, 0);
+    const goalsOwn = matches.reduce((acc, match) => acc + match.homeTeamGoals, 0);
     const goalsBalance = goalsFavor - goalsOwn;
     const efficiency = ((totalPoints / (totalGames * 3)) * 100).toFixed(2);
 
