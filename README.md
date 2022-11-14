@@ -1,4 +1,4 @@
-# Projeto Trybe Futebol Clube ⚽️🏆
+# Projeto Backend Futebol Clube ⚽️🏆
 
 A partir de uma aplicação Front-End desenvolvida pela _[Trybe](https://www.betrybe.com)_, foi desenvolvido uma API para prover as informações necessárias para um site informativo sobre partidas e classificações de futebol!
 
